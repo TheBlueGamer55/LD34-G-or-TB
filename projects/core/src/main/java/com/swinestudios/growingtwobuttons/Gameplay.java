@@ -12,12 +12,14 @@ import org.mini2Dx.core.screen.transition.FadeOutTransition;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputMultiplexer;
 
 public class Gameplay implements GameScreen{
 	
 	public static int ID = 2;
 	
 	public TreeTrunk tree;
+	public SpawningSystem spawner;
 	
 	public ArrayList<Projectile> projectiles;
 	
@@ -44,10 +46,16 @@ public class Gameplay implements GameScreen{
 	@Override
 	public void preTransitionIn(Transition t){
 		projectiles = new ArrayList<Projectile>();
-		tree = new TreeTrunk(300, 180, this); //TODO adjust position later
+		tree = new TreeTrunk(300, 100, this); //TODO adjust position later
+		spawner = new SpawningSystem(this);
 		
 		//Test projectiles
 		projectiles.add(new Projectile(20, 330, 4, 0, this));
+		
+		//Input handling
+		InputMultiplexer multiplexer = new InputMultiplexer();
+		multiplexer.addProcessor(tree);
+		Gdx.input.setInputProcessor(multiplexer);
 	}
 
 	@Override
@@ -66,6 +74,7 @@ public class Gameplay implements GameScreen{
 	public void update(GameContainer gc, ScreenManager<? extends GameScreen> sm, float delta) {
 		updateProjectiles(delta);
 		tree.update(delta);
+		spawner.update(delta);
 		
 		if(Gdx.input.isKeyJustPressed(Keys.ESCAPE)){
 			sm.enterGameScreen(MainMenu.ID, new FadeOutTransition(), new FadeInTransition());

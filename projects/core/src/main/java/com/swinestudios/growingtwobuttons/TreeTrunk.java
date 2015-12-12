@@ -37,7 +37,7 @@ public class TreeTrunk implements InputProcessor{
 		type = "TreeTrunk";
 		
 		//trunk = new Sprite(new Texture(Gdx.files.internal("")));
-		hitbox = new Rectangle(x, y, 40, 300); //adjust size later based on sprite
+		hitbox = new Rectangle(x, y, 40, 380); //adjust size later based on sprite
 	}
 
 	public void render(Graphics g){
