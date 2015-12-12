@@ -4,11 +4,14 @@ import org.mini2Dx.core.geom.Rectangle;
 import org.mini2Dx.core.graphics.Graphics;
 import org.mini2Dx.core.graphics.Sprite;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 
 public class Projectile{
 
-	public float x, y, velX, velY;
+	public float x, y, velX, velY, accelY;
+	public final float maxVelY = 4.0f; //Max dropping speed
+	public final float crashAccelY = 0.05f; //The falling acceleration
 
 	public boolean isActive;
 
@@ -22,6 +25,7 @@ public class Projectile{
 		this.y = y;
 		this.velX = velX;
 		this.velY = velY;
+		accelY = 0;
 		isActive = true;
 		this.level = level;
 		type = "Projectile";
@@ -44,12 +48,30 @@ public class Projectile{
 
 	public void update(float delta){
 		if(isActive){
+			if(velY < maxVelY){
+				velY += accelY;
+			}
 			x += velX;
 			y += velY;
 
 			hitbox.setX(x);
 			hitbox.setY(y);
+			
+			//Projectiles that have fallen down are removed
+			if(y > Gdx.graphics.getHeight()){
+				level.projectiles.remove(this);
+			}
 		}
+	}
+	
+	/*
+	 * When a projectile gets hit by a tree's projectile, it crashes
+	 * downwards at an angle until it disappears at the bottom.
+	 */
+	public void crash(){
+		//TODO rotate sprite while falling
+		System.out.println("Projectile crash");
+		accelY = crashAccelY;
 	}
 	
 	/*
@@ -57,6 +79,7 @@ public class Projectile{
 	 */
 	public void setSprite(Sprite s){
 		projectileSprite = new Sprite(s);
+		hitbox = new Rectangle(x, y, projectileSprite.getWidth(), projectileSprite.getHeight());
 	}
 
 	/*

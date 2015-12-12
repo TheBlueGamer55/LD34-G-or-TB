@@ -28,6 +28,7 @@ public class Gameplay implements GameScreen{
 	public SpawningSystem spawner;
 
 	public ArrayList<Projectile> projectiles;
+	public ArrayList<TreeProjectile> treeProjectiles;
 
 	@Override
 	public int getId(){
@@ -58,11 +59,13 @@ public class Gameplay implements GameScreen{
 		score = 0;
 
 		projectiles = new ArrayList<Projectile>();
+		treeProjectiles = new ArrayList<TreeProjectile>();
 		tree = new TreeTrunk(300, 100, this); //TODO adjust position later
 		spawner = new SpawningSystem(this);
-
-		//Test projectiles
-		projectiles.add(new Projectile(20, 330, 4, 0, this));
+		
+		//Testing projectiles
+		treeProjectiles.add(new TreeProjectile(60, 0, this));
+		projectiles.add(new Projectile(-20, 0, 0.5f, 0.2f, this));
 
 		//Input handling
 		InputMultiplexer multiplexer = new InputMultiplexer();
@@ -78,7 +81,12 @@ public class Gameplay implements GameScreen{
 	@Override
 	public void render(GameContainer gc, Graphics g){
 		renderProjectiles(g);
+		renderTreeProjectiles(g);
 		tree.render(g);
+		//TODO Test drawing
+		g.drawRect(0, 16, 640, 40);
+		g.drawRect(32, 0, 576, 80);
+		//System.out.println(Gdx.input.getX() + ", " + Gdx.input.getY());
 		
 		//TODO adjust UI for each menu
 		if(gameOver){
@@ -95,6 +103,7 @@ public class Gameplay implements GameScreen{
 	public void update(GameContainer gc, ScreenManager<? extends GameScreen> sm, float delta) {
 		if(!paused && !gameOver){
 			updateProjectiles(delta);
+			updateTreeProjectiles(delta);
 			tree.update(delta);
 			spawner.update(delta);
 			
@@ -134,6 +143,18 @@ public class Gameplay implements GameScreen{
 	public void updateProjectiles(float delta){
 		for(int i = 0; i < projectiles.size(); i++){
 			projectiles.get(i).update(delta);
+		}
+	}
+	
+	public void renderTreeProjectiles(Graphics g){
+		for(int i = 0; i < treeProjectiles.size(); i++){
+			treeProjectiles.get(i).render(g);
+		}
+	}
+
+	public void updateTreeProjectiles(float delta){
+		for(int i = 0; i < treeProjectiles.size(); i++){
+			treeProjectiles.get(i).update(delta);
 		}
 	}
 

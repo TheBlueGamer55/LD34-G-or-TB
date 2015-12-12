@@ -13,10 +13,10 @@ public class SpawningSystem{
 	public boolean isActive;
 	
 	//TODO adjust constants later
-	public final float spawnOffsetX = 42; //How far off screen horizontally a projectile spawns
+	public final float spawnOffsetX = 64; //How far off screen horizontally a projectile spawns
 	public final float spawnOffsetY = 32; //Y spawn coordinate from 0 to screen height - spawnOffsetY
-	public final float projectileVelY = 1.0f; //Due to relativity, projectiles move downward
-	public float projectileVelX = 4;
+	public final float projectileVelY = 0.2f; //Due to relativity, projectiles move downward
+	public float projectileVelX = 0.5f;
 	
 	public float spawnTimer;
 	public float maxSpawnTimer;
