@@ -53,6 +53,7 @@ public class MainMenu implements GameScreen{
 	public void render(GameContainer gc, Graphics g){
 		g.drawSprite(testSprite);
 		g.drawString("This is the main menu", 320, 240);
+		g.drawString("Highest height reached: " + (int)Gameplay.maxScore, 320, 256);
 	}
 
 	@Override

@@ -16,6 +16,9 @@ public class TreeTrunk implements InputProcessor{
 	//public boolean isAttacking;
 
 	public Sprite trunk;
+	
+	public final int maxHealth = 3; //TODO adjust later
+	public int health;
 
 	public Rectangle hitbox;
 	public Gameplay level;
@@ -32,6 +35,7 @@ public class TreeTrunk implements InputProcessor{
 		this.y = y;
 		velX = 0;
 		velY = 0;
+		health = maxHealth;
 		isActive = true;
 		this.level = level;
 		type = "TreeTrunk";
@@ -42,6 +46,7 @@ public class TreeTrunk implements InputProcessor{
 
 	public void render(Graphics g){
 		//Debug - remove later
+		g.drawString("" + (int)Math.floor(level.score), x, y);
 		g.drawRect(x, y, hitbox.width, hitbox.height);
 	}
 
@@ -78,11 +83,15 @@ public class TreeTrunk implements InputProcessor{
 	}
 	
 	/*
-	 * Deal damage to trunk
+	 * Deal damage to trunk and handle game over if out of health
 	 */
 	public void dealDamage(){
 		//TODO deal damage to trunk
 		System.out.println("Tree was hit");
+		health--;
+		if(health <= 0){
+			level.gameOver = true;
+		}
 	}
 
 	/*
