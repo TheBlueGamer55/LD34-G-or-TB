@@ -5,8 +5,10 @@ import org.mini2Dx.core.graphics.Graphics;
 import org.mini2Dx.core.graphics.Sprite;
 
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 
 public class TreeTrunk implements InputProcessor{ 
 
@@ -14,7 +16,6 @@ public class TreeTrunk implements InputProcessor{
 	public float velX, velY;
 
 	public boolean isActive;
-	//public boolean isAttacking;
 	
 	//Spawn coordinates
 	public final float[][] spawnPoints = {{60, 0}, {160, 38}, {250, 16}, {400, 60}, {490, 4}, {587, 27}};
@@ -29,7 +30,7 @@ public class TreeTrunk implements InputProcessor{
 	public final float selectorRadius = 24.0f;
 	public final float selectorMaxSpeed = 2.0f;
 
-	public Sprite trunk;
+	public Sprite treeTrunk, treeTop;
 	
 	public final int maxHealth = 3; //TODO adjust later
 	public int health;
@@ -62,11 +63,18 @@ public class TreeTrunk implements InputProcessor{
 				selectorAmount, selectorRadius, selectorMaxSpeed, selectorColor, level);
 		acorns[selection].isSelected = true;
 		
-		//trunk = new Sprite(new Texture(Gdx.files.internal("")));
+		treeTrunk = new Sprite(new Texture(Gdx.files.internal("tree_trunk.png")));
+		treeTop = new Sprite(new Texture(Gdx.files.internal("tree_top.png")));
+		treeTrunk.setSize(treeTrunk.getWidth() * 2, treeTrunk.getHeight() * 2);
+		treeTop.setSize(treeTop.getWidth() * 2, treeTop.getHeight() * 2);
+		
 		hitbox = new Rectangle(x, y, 40, 380); //adjust size later based on sprite
 	}
 
 	public void render(Graphics g){
+		g.drawSprite(treeTrunk, x, y); //300, 100
+		g.drawSprite(treeTop, 0, 0);
+		
 		//Debug - remove later
 		g.drawString("" + (int)Math.floor(level.score), x, y);
 		g.drawString("" + selection, x, y + 20);
@@ -215,7 +223,6 @@ public class TreeTrunk implements InputProcessor{
 
 	@Override
 	public boolean keyUp(int keycode) {
-		//TODO empty
 		return false;
 	}
 

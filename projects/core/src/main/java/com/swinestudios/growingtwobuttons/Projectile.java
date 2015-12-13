@@ -33,7 +33,7 @@ public class Projectile{
 		type = "Projectile";
 		//projectileSprite = new Sprite(new Texture(Gdx.files.internal("______.png")));
 		//adjustSprite(projectileSprite);
-		hitbox = new Rectangle(x, y, 16, 16); //TODO make dimensions based on sprite
+		hitbox = new Rectangle(x, y, 16, 16); //Temporary
 	}
 
 	public void render(Graphics g){

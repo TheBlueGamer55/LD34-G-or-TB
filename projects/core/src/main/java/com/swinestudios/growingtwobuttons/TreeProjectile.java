@@ -51,8 +51,8 @@ public class TreeProjectile{
 		this.level = level;
 		type = "TreeProjectile";
 		projectileSprite = new Sprite(new Texture(Gdx.files.internal("acorn_temp.png")));
-		projectileSprite.setOrigin(projectileSprite.getWidth() / 2, 2); //TODO test for scaling up from correct origin
-		hitbox = new Rectangle(x, y, projectileSprite.getWidth(), projectileSprite.getHeight()); //TODO make dimensions based on sprite
+		projectileSprite.setOrigin(projectileSprite.getWidth() / 2, 2); 
+		hitbox = new Rectangle(x, y, projectileSprite.getWidth(), projectileSprite.getHeight()); 
 		initialWidth = hitbox.width;
 		initialHeight = hitbox.height;
 	}

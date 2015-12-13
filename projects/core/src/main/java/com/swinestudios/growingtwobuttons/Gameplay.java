@@ -78,15 +78,6 @@ public class Gameplay implements GameScreen{
 		projectiles = new ArrayList<Projectile>();
 		tree = new TreeTrunk(300, 100, this); //TODO adjust position later
 		spawner = new SpawningSystem(this);
-		
-		//TODO Testing projectiles
-		/*treeProjectiles.add(new TreeProjectile(60, 0, this));
-		treeProjectiles.add(new TreeProjectile(160, 38, this));
-		treeProjectiles.add(new TreeProjectile(250, 16, this));
-		treeProjectiles.add(new TreeProjectile(400, 60, this));
-		treeProjectiles.add(new TreeProjectile(490, 4, this));
-		treeProjectiles.add(new TreeProjectile(587, 27, this));*/
-		//projectiles.add(new Projectile(-20, 0, 0.5f, 0.2f, this));
 
 		//Input handling
 		InputMultiplexer multiplexer = new InputMultiplexer();
@@ -110,8 +101,8 @@ public class Gameplay implements GameScreen{
 		}
 		
 		renderStars(g);
-		renderTreeProjectiles(g);
 		tree.render(g);
+		renderTreeProjectiles(g);
 		renderProjectiles(g);
 		tree.renderSelector(g);
 		//TODO Test drawing
