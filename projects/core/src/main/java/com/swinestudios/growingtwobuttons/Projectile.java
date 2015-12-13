@@ -10,8 +10,8 @@ import com.badlogic.gdx.graphics.Color;
 public class Projectile{
 
 	public float x, y, velX, velY, accelY;
-	public final float maxVelY = 6.0f; //Max dropping speed
-	public final float crashAccelY = 0.05f; //The falling acceleration
+	public final float maxVelY = 9.0f; //Max dropping speed
+	public final float crashAccelY = 0.08f; //The falling acceleration
 
 	public boolean isActive;
 	public boolean isFalling;
@@ -74,7 +74,6 @@ public class Projectile{
 		//TODO rotate sprite while falling
 		if(!isFalling){
 			isFalling = true;
-			System.out.println("Projectile crash");
 			accelY = crashAccelY;
 		}
 	}

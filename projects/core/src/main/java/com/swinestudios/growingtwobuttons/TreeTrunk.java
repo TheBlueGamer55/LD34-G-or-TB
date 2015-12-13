@@ -58,9 +58,9 @@ public class TreeTrunk implements InputProcessor{
 		
 		acorns = new TreeProjectile[spawnPoints.length];
 		spawnAcorns();
-		
 		selector = new Particles(acorns[selection].hitbox.getCenterX(), acorns[selection].hitbox.getCenterY(), 
 				selectorAmount, selectorRadius, selectorMaxSpeed, selectorColor, level);
+		acorns[selection].isSelected = true;
 		
 		//trunk = new Sprite(new Texture(Gdx.files.internal("")));
 		hitbox = new Rectangle(x, y, 40, 380); //adjust size later based on sprite
@@ -86,7 +86,6 @@ public class TreeTrunk implements InputProcessor{
 	 */
 	public void dealDamage(){
 		//TODO deal damage to trunk
-		System.out.println("Tree was hit");
 		health--;
 		if(health <= 0){
 			level.gameOver = true;

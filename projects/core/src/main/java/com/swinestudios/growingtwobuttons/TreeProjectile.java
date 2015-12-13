@@ -13,8 +13,10 @@ import com.badlogic.gdx.graphics.Texture;
 public class TreeProjectile{
 
 	public float initialX, initialY, initialWidth, initialHeight;
-	public float x, y, velY;
-	public float fallingSpeed = 2.0f;
+	public float x, y, velY, accelY;
+	public final float maxVelY = 8.5f; //Max dropping speed
+	public final float crashAccelY = 0.05f; //The falling acceleration
+	//public float fallingSpeed = 2.0f;
 	public final float maxGrowthWidth = 64;
 	public final float maxGrowthHeight = 64;
 
@@ -41,6 +43,7 @@ public class TreeProjectile{
 		initialX = x;
 		initialY = y;
 		velY = 0;
+		accelY = 0;
 		isActive = true;
 		canGrow = true;
 		isSelected = false;
@@ -68,6 +71,7 @@ public class TreeProjectile{
 
 	public void update(float delta){
 		if(isActive){
+			velY += accelY;
 			y += velY;
 			
 			//Grow until the max dimensions are reached, or if released
@@ -103,6 +107,7 @@ public class TreeProjectile{
 		x = initialX;
 		y = initialY;
 		velY = 0;
+		accelY = 0;
 		isActive = false;
 		canGrow = false;
 		projectileSprite.setSize(initialWidth, initialHeight);
@@ -118,7 +123,8 @@ public class TreeProjectile{
 	 */
 	public void drop(){
 		//TODO different falling speeds based on size?
-		velY = fallingSpeed;
+		//velY = fallingSpeed;
+		accelY = crashAccelY;
 		canGrow = false;
 		onTree = false;
 	}
@@ -163,6 +169,7 @@ public class TreeProjectile{
 			if(temp != null && temp.isActive){
 				if(isColliding(temp.hitbox, this.x, this.y)){ //If there is a collision
 					temp.crash();
+					temp.velY = this.velY; //Momentum
 					//TODO maybe an explosion of particles for added effect?
 				}
 			}
