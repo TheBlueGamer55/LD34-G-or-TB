@@ -1,6 +1,7 @@
 package com.swinestudios.growingtwobuttons;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import org.mini2Dx.core.game.GameContainer;
 import org.mini2Dx.core.graphics.Graphics;
@@ -23,12 +24,22 @@ public class Gameplay implements GameScreen{
 	public static float maxScore = 0;
 	public boolean gameOver = false;
 	public boolean paused = false;
+	
+	public boolean isShaking;
+	public final int shakeMagnitude = 12; //Screen shake
+	public float screenShakeTimer;
+	public float maxScreenShakeTimer = 0.5f;
+	
+	public final int starAmount = 80; //For the moving stars in the background
+	public Star[] stars;
 
 	public TreeTrunk tree;
 	public SpawningSystem spawner;
 
 	public ArrayList<Projectile> projectiles;
 	public ArrayList<TreeProjectile> treeProjectiles;
+	
+	public Random random;
 
 	@Override
 	public int getId(){
@@ -37,7 +48,11 @@ public class Gameplay implements GameScreen{
 
 	@Override
 	public void initialise(GameContainer gc){
-
+		random = new Random();
+		stars = new Star[starAmount];
+		for(int i = 0; i < stars.length; i++){
+			stars[i] = new Star(random.nextInt(gc.getWidth()), random.nextInt(gc.getHeight()), true);
+		}
 	}
 
 	@Override
@@ -54,6 +69,7 @@ public class Gameplay implements GameScreen{
 
 	@Override
 	public void preTransitionIn(Transition t){
+		isShaking = false;
 		gameOver = false;
 		paused = false;
 		score = 0;
@@ -85,6 +101,15 @@ public class Gameplay implements GameScreen{
 
 	@Override
 	public void render(GameContainer gc, Graphics g){
+		//Screen shake effect
+		if(isShaking){
+			g.translate(random.nextInt(shakeMagnitude * 2) - shakeMagnitude, random.nextInt(shakeMagnitude * 2) - shakeMagnitude);
+		}
+		else{
+			g.translate(0, 0);
+		}
+		
+		renderStars(g);
 		renderTreeProjectiles(g);
 		tree.render(g);
 		renderProjectiles(g);
@@ -97,6 +122,7 @@ public class Gameplay implements GameScreen{
 		
 		//TODO adjust UI for each menu
 		if(gameOver){
+			isShaking = false;
 			g.setColor(Color.RED);
 			g.drawString("You died! Press Escape to go back to the main menu", 160, 240);
 		}
@@ -109,6 +135,15 @@ public class Gameplay implements GameScreen{
 	@Override
 	public void update(GameContainer gc, ScreenManager<? extends GameScreen> sm, float delta) {
 		if(!paused && !gameOver){
+			if(isShaking){
+				screenShakeTimer += delta;
+				if(screenShakeTimer >= maxScreenShakeTimer){
+					screenShakeTimer = 0;
+					isShaking = false;
+				}
+			}
+			
+			updateStars(delta);
 			updateProjectiles(delta);
 			updateTreeProjectiles(delta);
 			tree.update(delta);
@@ -163,6 +198,18 @@ public class Gameplay implements GameScreen{
 	public void updateTreeProjectiles(float delta){
 		for(int i = 0; i < treeProjectiles.size(); i++){
 			treeProjectiles.get(i).update(delta);
+		}
+	}
+	
+	public void renderStars(Graphics g){
+		for(int i = 0; i < stars.length; i++){ 
+			stars[i].render(g);
+		}
+	}
+	
+	public void updateStars(float delta){
+		for(int i = 0; i < stars.length; i++){
+			stars[i].update(delta);
 		}
 	}
 

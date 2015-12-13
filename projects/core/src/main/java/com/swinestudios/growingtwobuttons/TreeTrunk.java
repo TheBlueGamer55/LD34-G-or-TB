@@ -86,6 +86,9 @@ public class TreeTrunk implements InputProcessor{
 	 */
 	public void dealDamage(){
 		//TODO deal damage to trunk
+		if(!level.isShaking){
+			level.isShaking = true;
+		}
 		health--;
 		if(health <= 0){
 			level.gameOver = true;
