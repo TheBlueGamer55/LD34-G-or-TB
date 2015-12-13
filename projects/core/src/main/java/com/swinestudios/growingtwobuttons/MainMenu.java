@@ -2,7 +2,6 @@ package com.swinestudios.growingtwobuttons;
 
 import org.mini2Dx.core.game.GameContainer;
 import org.mini2Dx.core.graphics.Graphics;
-import org.mini2Dx.core.graphics.Sprite;
 import org.mini2Dx.core.screen.GameScreen;
 import org.mini2Dx.core.screen.ScreenManager;
 import org.mini2Dx.core.screen.Transition;
@@ -11,13 +10,10 @@ import org.mini2Dx.core.screen.transition.FadeOutTransition;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.Texture;
 
 public class MainMenu implements GameScreen{
 	
 	public static int ID = 1;
-	
-	public Sprite testSprite;
 	
 	@Override
 	public int getId(){
@@ -26,7 +22,7 @@ public class MainMenu implements GameScreen{
 
 	@Override
 	public void initialise(GameContainer gc){
-		testSprite = new Sprite(new Texture(Gdx.files.internal("mini2Dx.png")));
+		
 	}
 
 	@Override
@@ -51,7 +47,6 @@ public class MainMenu implements GameScreen{
 
 	@Override
 	public void render(GameContainer gc, Graphics g){
-		g.drawSprite(testSprite);
 		g.drawString("This is the main menu", 320, 240);
 		g.drawString("Highest height reached: " + (int)Gameplay.maxScore, 320, 256);
 	}
