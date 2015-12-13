@@ -10,10 +10,11 @@ import com.badlogic.gdx.graphics.Color;
 public class Projectile{
 
 	public float x, y, velX, velY, accelY;
-	public final float maxVelY = 4.0f; //Max dropping speed
+	public final float maxVelY = 6.0f; //Max dropping speed
 	public final float crashAccelY = 0.05f; //The falling acceleration
 
 	public boolean isActive;
+	public boolean isFalling;
 
 	public Rectangle hitbox;
 	public Gameplay level;
@@ -27,6 +28,7 @@ public class Projectile{
 		this.velY = velY;
 		accelY = 0;
 		isActive = true;
+		isFalling = false;
 		this.level = level;
 		type = "Projectile";
 		//projectileSprite = new Sprite(new Texture(Gdx.files.internal("______.png")));
@@ -57,7 +59,7 @@ public class Projectile{
 			hitbox.setX(x);
 			hitbox.setY(y);
 			
-			//Projectiles that have fallen down are removed
+			//Projectiles that have fallen off-screen are removed
 			if(y > Gdx.graphics.getHeight()){
 				level.projectiles.remove(this);
 			}
@@ -70,8 +72,11 @@ public class Projectile{
 	 */
 	public void crash(){
 		//TODO rotate sprite while falling
-		System.out.println("Projectile crash");
-		accelY = crashAccelY;
+		if(!isFalling){
+			isFalling = true;
+			System.out.println("Projectile crash");
+			accelY = crashAccelY;
+		}
 	}
 	
 	/*

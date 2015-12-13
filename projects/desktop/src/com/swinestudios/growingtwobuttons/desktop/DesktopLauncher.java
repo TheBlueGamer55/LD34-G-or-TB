@@ -14,8 +14,8 @@ public class DesktopLauncher {
 		config.height = 480;
 		config.vSyncEnabled = true;
 		config.resizable = false;
-        config.foregroundFPS = 60;
-        config.backgroundFPS = 60;
+        config.foregroundFPS = 30;
+        config.backgroundFPS = 30;
         config.title = "TO BE NAMED LATER";
 		new DesktopMini2DxGame(new GrowingTwoButtons(), config);
 	}

@@ -58,14 +58,19 @@ public class Gameplay implements GameScreen{
 		paused = false;
 		score = 0;
 
-		projectiles = new ArrayList<Projectile>();
 		treeProjectiles = new ArrayList<TreeProjectile>();
+		projectiles = new ArrayList<Projectile>();
 		tree = new TreeTrunk(300, 100, this); //TODO adjust position later
 		spawner = new SpawningSystem(this);
 		
-		//Testing projectiles
-		treeProjectiles.add(new TreeProjectile(60, 0, this));
-		projectiles.add(new Projectile(-20, 0, 0.5f, 0.2f, this));
+		//TODO Testing projectiles
+		/*treeProjectiles.add(new TreeProjectile(60, 0, this));
+		treeProjectiles.add(new TreeProjectile(160, 38, this));
+		treeProjectiles.add(new TreeProjectile(250, 16, this));
+		treeProjectiles.add(new TreeProjectile(400, 60, this));
+		treeProjectiles.add(new TreeProjectile(490, 4, this));
+		treeProjectiles.add(new TreeProjectile(587, 27, this));*/
+		//projectiles.add(new Projectile(-20, 0, 0.5f, 0.2f, this));
 
 		//Input handling
 		InputMultiplexer multiplexer = new InputMultiplexer();
@@ -80,13 +85,15 @@ public class Gameplay implements GameScreen{
 
 	@Override
 	public void render(GameContainer gc, Graphics g){
-		renderProjectiles(g);
 		renderTreeProjectiles(g);
 		tree.render(g);
+		renderProjectiles(g);
+		tree.renderSelector(g);
 		//TODO Test drawing
+		g.setColor(Color.GREEN);
 		g.drawRect(0, 16, 640, 40);
 		g.drawRect(32, 0, 576, 80);
-		//System.out.println(Gdx.input.getX() + ", " + Gdx.input.getY());
+		//System.out.println(Gdx.input.getX() + ", " + Gdx.input.getY()); //TODO remove later
 		
 		//TODO adjust UI for each menu
 		if(gameOver){
@@ -105,6 +112,7 @@ public class Gameplay implements GameScreen{
 			updateProjectiles(delta);
 			updateTreeProjectiles(delta);
 			tree.update(delta);
+			tree.updateSelector(delta);
 			spawner.update(delta);
 			
 			//Update score
