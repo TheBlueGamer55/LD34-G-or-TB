@@ -85,6 +85,7 @@ public class SpawningSystem{
 		
 		Projectile p = new Projectile(spawnX, spawnY, velX, velY, level);
 		p.setSprite(projectileSprites[choice]);
+		p.setID(choice);
 		level.projectiles.add(p);
 		if(choice == 0){ //If white dwarf
 			//Create particle light effect TODO adjust constants later

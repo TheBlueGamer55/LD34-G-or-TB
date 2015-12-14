@@ -21,7 +21,8 @@ public class Projectile{
 	public String type;
 	public Sprite projectileSprite;
 	
-	public Particles effect;
+	public Particles effect, rockScrap;
+	public int ID;
 
 	public Projectile(float x, float y, float velX, float velY, Gameplay level){
 		this.x = x;
@@ -29,11 +30,13 @@ public class Projectile{
 		this.velX = velX;
 		this.velY = velY;
 		accelY = 0;
+		ID = -1;
 		isActive = true;
 		isFalling = false;
 		this.level = level;
 		type = "Projectile";
 		effect = null;
+		rockScrap = null;
 		//projectileSprite = new Sprite(new Texture(Gdx.files.internal("______.png")));
 		//adjustSprite(projectileSprite);
 		hitbox = new Rectangle(x, y, 16, 16); //Temporary
@@ -45,6 +48,9 @@ public class Projectile{
 				if(effect != null){
 					effect.render(g);
 				}
+				/*if(rockScrap != null){
+					rockScrap.render(g);
+				}*/
 				g.drawSprite(projectileSprite, x, y);
 			}
 			else{ //Temporary shape placeholder
@@ -71,6 +77,10 @@ public class Projectile{
 				effect.update(delta);
 			}
 			
+			/*if(rockScrap != null){
+				rockScrap.update(delta);
+			}*/
+			
 			//Projectiles that have fallen off-screen are removed
 			if(y > Gdx.graphics.getHeight()){
 				level.projectiles.remove(this);
@@ -87,11 +97,31 @@ public class Projectile{
 		if(!isFalling){
 			isFalling = true;
 			accelY = crashAccelY;
+			//TODO adjust debris constants later
+			if(ID == 1 || ID == 2){ //Debris only for asteroid projectiles
+				createDebris(Color.BROWN, 40, 600f, 4.0f, 3, 4);
+			}
 		}
 	}
 	
 	public void setEffect(Color c, int amount, float radius, float maxSpeed){
 		effect = new Particles(hitbox.getCenterX(), hitbox.getCenterY(), amount, radius, maxSpeed, c, level);
+	}
+	
+	public void setID(int n){
+		ID = n;
+	}
+	
+	/*
+	 * Creates particles that disappear after a given amount of time and are not
+	 * restricted to a given range.
+	 */
+	public void createDebris(Color c, int amount, float radius, float maxSpeed, float lifetime, int size){
+		rockScrap = new Particles(hitbox.getCenterX(), hitbox.getCenterY(), amount, radius, maxSpeed, c, level);
+		rockScrap.setTimer(lifetime);
+		rockScrap.removeRange();
+		rockScrap.setParticleSize(size);
+		level.debris.add(rockScrap);
 	}
 	
 	/*

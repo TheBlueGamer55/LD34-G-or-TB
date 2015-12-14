@@ -38,6 +38,7 @@ public class Gameplay implements GameScreen{
 
 	public ArrayList<Projectile> projectiles;
 	public ArrayList<TreeProjectile> treeProjectiles;
+	public ArrayList<Particles> debris;
 	
 	public Random random;
 
@@ -76,6 +77,7 @@ public class Gameplay implements GameScreen{
 
 		treeProjectiles = new ArrayList<TreeProjectile>();
 		projectiles = new ArrayList<Projectile>();
+		debris = new ArrayList<Particles>();
 		tree = new TreeTrunk(300, 100, this); //TODO adjust position later
 		spawner = new SpawningSystem(this);
 
@@ -103,6 +105,7 @@ public class Gameplay implements GameScreen{
 		renderStars(g);
 		tree.render(g);
 		renderTreeProjectiles(g);
+		renderDebris(g);
 		renderProjectiles(g);
 		tree.renderSelector(g);
 		//System.out.println(Gdx.input.getX() + ", " + Gdx.input.getY()); //TODO remove later
@@ -131,6 +134,7 @@ public class Gameplay implements GameScreen{
 			}
 			
 			updateStars(delta);
+			updateDebris(delta);
 			updateProjectiles(delta);
 			updateTreeProjectiles(delta);
 			tree.update(delta);
@@ -185,6 +189,18 @@ public class Gameplay implements GameScreen{
 	public void updateTreeProjectiles(float delta){
 		for(int i = 0; i < treeProjectiles.size(); i++){
 			treeProjectiles.get(i).update(delta);
+		}
+	}
+	
+	public void renderDebris(Graphics g){
+		for(int i = 0; i < debris.size(); i++){
+			debris.get(i).render(g);
+		}
+	}
+	
+	public void updateDebris(float delta){
+		for(int i = 0; i < debris.size(); i++){
+			debris.get(i).update(delta);
 		}
 	}
 	

@@ -42,7 +42,7 @@ public class TreeProjectile{
 	
 	public Random random = new Random();
 	
-	public static Sound rustle = Gdx.audio.newSound(Gdx.files.internal("leavesRustle2.wav"));
+	public Sound rustle = Gdx.audio.newSound(Gdx.files.internal("leavesRustle2.wav"));
 	public Sound acornKnock = Gdx.audio.newSound(Gdx.files.internal("acornHit.wav"));
 
 	public TreeProjectile(float x, float y, Gameplay level){

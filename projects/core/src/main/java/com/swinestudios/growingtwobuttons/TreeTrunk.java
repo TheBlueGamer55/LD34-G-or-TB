@@ -48,8 +48,9 @@ public class TreeTrunk implements InputProcessor{
 	public Gameplay level;
 	public String type;
 
-	public static Sound hurt = Gdx.audio.newSound(Gdx.files.internal("treeDead.wav"));
+	public static Sound treeFall = Gdx.audio.newSound(Gdx.files.internal("treeDead.wav"));
 	public static Sound dropAcorn = Gdx.audio.newSound(Gdx.files.internal("dropSound.wav"));
+	public static Sound explosionHit = Gdx.audio.newSound(Gdx.files.internal("HighDamageHit.wav"));
 
 	//Controls/key bindings
 	public final int LEFT = Keys.LEFT;
@@ -137,7 +138,7 @@ public class TreeTrunk implements InputProcessor{
 		health--;
 		if(health <= 0){ 
 			isFalling = true;
-			hurt.play();
+			treeFall.play();
 			//Rotational origin and direction depends on where the tree was hit
 			float centerX = treeTrunk.getWidth() / 2;
 			float centerY = 2*y + treeTrunk.getHeight() - p.y; //Formula for opposite y coordinate within range of height
@@ -161,6 +162,24 @@ public class TreeTrunk implements InputProcessor{
 			treeTrunk.setOrigin(centerX, centerY);
 		}
 		dropAllAcorns();
+	}
+	
+	/*
+	 * Plays the appropriate sound based on the projectile that hit
+	 * the tree.
+	 */
+	public void playCorrectNoise(int id){
+		//TODO add sounds for each unique projectile type
+		switch(id){
+			case 0: //Hit by white dwarf/planet
+				break;
+			case 1: //Hit by asteroid
+			case 2:
+				explosionHit.play();
+				break;
+			default:
+				break;
+		}
 	}
 
 	/*
@@ -226,8 +245,10 @@ public class TreeTrunk implements InputProcessor{
 			if(temp != null && temp.isActive){
 				//If there is a collision with an active projectile
 				if(!temp.isFalling && isColliding(temp.hitbox, this.x, this.y)){ 
-					level.projectiles.remove(temp);
+					//level.projectiles.remove(temp);
+					temp.crash();
 					dealDamage(temp);
+					playCorrectNoise(temp.ID);
 				}
 			}
 		}
