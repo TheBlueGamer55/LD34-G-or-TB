@@ -7,6 +7,7 @@ import org.mini2Dx.core.graphics.Sprite;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 
@@ -14,17 +15,22 @@ public class TreeTrunk implements InputProcessor{
 
 	public float x, y, initialY;
 	public float velX, velY;
+	public final float maxVelY = 8.5f; //Max falling speed
+	public final float fallingAccelY = 0.05f; //The falling acceleration
+	public float rotateSpeed = 20; //Rotating speed used with delta time
+
 	public float netOffset;
 	public final float hoverSpeed = 0.2f; //Speed of hovering effect
 	public final float hoverRange = 12; //Range of hovering effect
 
 	public boolean isActive;
-	
+	public boolean isFalling;
+
 	//Spawn coordinates
 	public final float[][] spawnPoints = {{60, 0}, {160, 38}, {250, 16}, {400, 60}, {490, 4}, {587, 27}};
-	
+
 	public TreeProjectile[] acorns;
-	
+
 	public int selection; //Determines which projectile is currently selected
 	public Particles selector;
 	//Constants for arguments to the selector TODO adjust later
@@ -34,7 +40,7 @@ public class TreeTrunk implements InputProcessor{
 	public final float selectorMaxSpeed = 2.0f;
 
 	public Sprite treeTrunk, treeTop;
-	
+
 	public final int maxHealth = 3; //TODO adjust later
 	public int health;
 
@@ -42,7 +48,7 @@ public class TreeTrunk implements InputProcessor{
 	public Gameplay level;
 	public String type;
 
-	//public static Sound hurt = Gdx.audio.newSound(Gdx.files.internal(""));
+	public static Sound hurt = Gdx.audio.newSound(Gdx.files.internal("treeDead.wav"));
 
 	//Controls/key bindings
 	public final int LEFT = Keys.LEFT;
@@ -59,66 +65,105 @@ public class TreeTrunk implements InputProcessor{
 		selection = 0;
 		health = maxHealth;
 		isActive = true;
+		isFalling = false;
 		this.level = level;
 		type = "TreeTrunk";
-		
+
 		acorns = new TreeProjectile[spawnPoints.length];
 		spawnAcorns();
 		selector = new Particles(acorns[selection].hitbox.getCenterX(), acorns[selection].hitbox.getCenterY(), 
 				selectorAmount, selectorRadius, selectorMaxSpeed, selectorColor, level);
 		acorns[selection].isSelected = true;
-		
+
 		treeTrunk = new Sprite(new Texture(Gdx.files.internal("tree_trunk.png")));
 		treeTop = new Sprite(new Texture(Gdx.files.internal("tree_top.png")));
 		treeTrunk.setSize(treeTrunk.getWidth() * 2, treeTrunk.getHeight() * 2);
 		treeTop.setSize(treeTop.getWidth() * 2, treeTop.getHeight() * 2);
-		
+
 		hitbox = new Rectangle(x, y, 40, 380); //adjust size later based on sprite
 	}
 
 	public void render(Graphics g){
-		g.drawSprite(treeTrunk, x, y); //300, 100
-		g.drawSprite(treeTop, 0, y - initialY);
-		
-		//Debug - remove later
-		g.drawString("" + (int)Math.floor(level.score), x, y);
-		g.drawString("" + selection, x, y + 20);
-		g.setColor(Color.BROWN);
-		g.drawRect(x, y, hitbox.width, hitbox.height);
+		if(isActive){
+			g.drawSprite(treeTrunk, x, y); //300, 100
+			g.drawSprite(treeTop, 0, y - initialY);
+
+			//Debug - remove later
+			g.drawString("" + (int)Math.floor(level.score), x, y);
+			g.drawString("" + selection, x, y + 20);
+			g.setColor(Color.BROWN);
+			g.drawRect(x, y, hitbox.width, hitbox.height);
+		}
 	}
 
 	public void update(float delta){
-		netOffset += velY;
-		moveAcorns();
-		y += velY;
-		if(y > initialY + hoverRange){
-			velY *= -1;
-		}
-		if(y <= initialY){
-			velY *= -1;
-		}
-		
-		hitbox.setX(this.x);
-		hitbox.setY(this.y);
+		if(!isFalling && isActive){
+			netOffset += velY;
+			moveAcorns();
+			y += velY;
+			if(y > initialY + hoverRange){
+				velY *= -1;
+			}
+			if(y <= initialY){
+				velY *= -1;
+			}
 
-		checkProjectileCollision();
+			hitbox.setX(this.x);
+			hitbox.setY(this.y);
+
+			checkProjectileCollision();
+		}
+		else if(isFalling){ //Tree died and is falling
+			dropAllAcorns();
+			velY += fallingAccelY;
+			y += velY;
+			//Rotate tree as it falls
+			treeTrunk.rotate(delta * rotateSpeed);
+
+			if(y - initialY > Gdx.graphics.getHeight()){ //End of falling "animation"
+				isFalling = false;
+				isActive = false;
+				level.gameOver = true;
+			}
+		}
 	}
-	
+
 	/*
 	 * Deal damage to trunk and handle game over if out of health
 	 */
-	public void dealDamage(){
-		//TODO deal damage to trunk
+	public void dealDamage(Projectile p){
 		if(!level.isShaking){
 			level.isShaking = true;
 		}
 		health--;
-		if(health <= 0){
-			level.gameOver = true;
+		if(health <= 0){ 
+			isFalling = true;
+			hurt.play();
+			//Rotational origin and direction depends on where the tree was hit
+			float centerX = treeTrunk.getWidth() / 2;
+			float centerY = 2*y + treeTrunk.getHeight() - p.y; //Formula for opposite y coordinate within range of height
+			//treeTrunk.setOrigin(treeTrunk.getWidth() / 2, p.y); 
+			if(p.x > this.x){ //If hit from the right
+				if(p.y > this.y + treeTrunk.getHeight() / 2){ //If hit from the bottom half
+					//Do nothing, the initial values are fine
+				}
+				else{ //If hit form the top half
+					rotateSpeed *= -1;
+				}
+			}
+			else{ //If hit from the left
+				if(p.y > this.y + treeTrunk.getHeight() / 2){ //If hit from the bottom half
+					rotateSpeed *= -1;
+				}
+				else{ //If hit from the top half
+					//Do nothing, the initial values are fine
+				}
+			}
+			treeTrunk.setOrigin(centerX, centerY);
 		}
 		dropAllAcorns();
 	}
-	
+
 	/*
 	 * Move acorns together with tree
 	 */
@@ -129,25 +174,25 @@ public class TreeTrunk implements InputProcessor{
 			}
 		}
 	}
-	
+
 	/*
 	 * Drops all acorns currently on the tree
 	 */
 	public void dropAllAcorns(){
 		for(int i = 0; i < level.treeProjectiles.size(); i++){
-			if(level.treeProjectiles.get(i).isActive){
+			if(level.treeProjectiles.get(i).isActive && level.treeProjectiles.get(i).onTree){
 				level.treeProjectiles.get(i).drop();
 			}
 		}
 	}
-	
+
 	/*
 	 * Precondition: The currently selected acorn is already growing, 0 <= selection < spawnPoints.length
 	 */
 	public void dropSelectedAcorn(){
 		acorns[selection].drop();
 	}
-	
+
 	/*
 	 * Spawns all the acorns at the spawn points on the tree's branches
 	 */
@@ -157,11 +202,11 @@ public class TreeTrunk implements InputProcessor{
 			level.treeProjectiles.add(acorns[i]);
 		}
 	}
-	
+
 	public void renderSelector(Graphics g){
 		selector.render(g);
 	}
-	
+
 	public void updateSelector(float delta){
 		//Update selector coordinates
 		if(acorns[selection].onTree){
@@ -182,7 +227,7 @@ public class TreeTrunk implements InputProcessor{
 				//If there is a collision with an active projectile
 				if(!temp.isFalling && isColliding(temp.hitbox, this.x, this.y)){ 
 					level.projectiles.remove(temp);
-					dealDamage();
+					dealDamage(temp);
 				}
 			}
 		}
