@@ -27,7 +27,7 @@ public class TreeTrunk implements InputProcessor{
 	public boolean isFalling;
 
 	//Spawn coordinates
-	public final float[][] spawnPoints = {{60, 0}, {160, 38}, {250, 16}, {400, 60}, {490, 4}, {587, 27}};
+	public final float[][] spawnPoints = {{60, 24}, {160, 62}, {250, 40}, {400, 84}, {490, 28}, {587, 51}};
 
 	public TreeProjectile[] acorns;
 

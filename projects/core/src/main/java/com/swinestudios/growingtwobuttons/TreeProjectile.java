@@ -50,7 +50,7 @@ public class TreeProjectile{
 		onTree = true;
 		this.level = level;
 		type = "TreeProjectile";
-		projectileSprite = new Sprite(new Texture(Gdx.files.internal("acorn_temp.png")));
+		projectileSprite = new Sprite(new Texture(Gdx.files.internal("acorn.png")));
 		projectileSprite.setOrigin(projectileSprite.getWidth() / 2, 2); 
 		hitbox = new Rectangle(x, y, projectileSprite.getWidth(), projectileSprite.getHeight()); 
 		initialWidth = hitbox.width;
