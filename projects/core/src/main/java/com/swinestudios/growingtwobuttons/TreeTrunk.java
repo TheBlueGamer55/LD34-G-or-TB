@@ -34,7 +34,7 @@ public class TreeTrunk implements InputProcessor{
 	public int selection; //Determines which projectile is currently selected
 	public Particles selector;
 	//Constants for arguments to the selector TODO adjust later
-	public final Color selectorColor = Color.YELLOW;
+	public final Color selectorColor = Color.WHITE;
 	public final int selectorAmount = 8;
 	public final float selectorRadius = 24.0f;
 	public final float selectorMaxSpeed = 2.0f;
@@ -49,6 +49,7 @@ public class TreeTrunk implements InputProcessor{
 	public String type;
 
 	public static Sound hurt = Gdx.audio.newSound(Gdx.files.internal("treeDead.wav"));
+	public static Sound dropAcorn = Gdx.audio.newSound(Gdx.files.internal("dropSound.wav"));
 
 	//Controls/key bindings
 	public final int LEFT = Keys.LEFT;
@@ -91,8 +92,6 @@ public class TreeTrunk implements InputProcessor{
 			//Debug - remove later
 			g.drawString("" + (int)Math.floor(level.score), x, y);
 			g.drawString("" + selection, x, y + 20);
-			g.setColor(Color.BROWN);
-			g.drawRect(x, y, hitbox.width, hitbox.height);
 		}
 	}
 
@@ -191,6 +190,7 @@ public class TreeTrunk implements InputProcessor{
 	 */
 	public void dropSelectedAcorn(){
 		acorns[selection].drop();
+		dropAcorn.play();
 	}
 
 	/*

@@ -6,6 +6,7 @@ import org.mini2Dx.core.graphics.Graphics;
 import org.mini2Dx.core.graphics.Sprite;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 
 public class SpawningSystem{
@@ -13,8 +14,8 @@ public class SpawningSystem{
 	public boolean isActive;
 	
 	//TODO adjust constants later
-	public final float spawnOffsetX = 64; //How far off screen horizontally a projectile spawns
-	public final float spawnOffsetY = 32; //Y spawn coordinate from 0 to screen height - spawnOffsetY
+	public final float spawnOffsetX = 128; //How far off screen horizontally a projectile spawns
+	//public final float spawnOffsetY = 32; //Y spawn coordinate from 0 to screen height - spawnOffsetY
 	public final float projectileVelY = 0.2f; //Due to relativity, projectiles move downward
 	public float projectileVelX = 0.5f;
 	
@@ -26,11 +27,17 @@ public class SpawningSystem{
 	
 	public Random random = new Random();
 	
-	//Variety of projectile sprites
-	public Sprite frisbee = new Sprite(new Texture(Gdx.files.internal("frisbee_temp.png")));
-	public Sprite rock = new Sprite(new Texture(Gdx.files.internal("rock_temp.png")));
-	public Sprite[] projectileSprites = {frisbee,
-										rock};
+	/*
+	 * Variety of projectile sprites
+	 * 0 = White dwarf
+	 * 1 = asteroid 1
+	 */
+	public Sprite whiteDwarf = new Sprite(new Texture(Gdx.files.internal("white_dwarf.png")));
+	public Sprite asteroid1 = new Sprite(new Texture(Gdx.files.internal("asteroid1.png")));
+	public Sprite asteroid2 = new Sprite(new Texture(Gdx.files.internal("asteroid2.png")));
+	public Sprite[] projectileSprites = {whiteDwarf,
+										asteroid1,
+										asteroid2};
 
 	public SpawningSystem(Gameplay level){
 		isActive = true;
@@ -41,7 +48,7 @@ public class SpawningSystem{
 	}
 
 	public void render(Graphics g){
-		//TODO empty?
+		//Empty
 	}
 
 	public void update(float delta){
@@ -74,11 +81,15 @@ public class SpawningSystem{
 			spawnX = Gdx.graphics.getWidth() + spawnOffsetX;
 			velX = -projectileVelX;
 		}
-		spawnY = random.nextInt((int) (level.tree.hitbox.height)); //TODO adjust later
+		spawnY = 90 + random.nextInt((int) level.tree.hitbox.height); //TODO adjust later
 		
 		Projectile p = new Projectile(spawnX, spawnY, velX, velY, level);
 		p.setSprite(projectileSprites[choice]);
 		level.projectiles.add(p);
+		if(choice == 0){ //If white dwarf
+			//Create particle light effect TODO adjust constants later
+			p.setEffect(Color.WHITE, 75, 112, 6.0f);
+		}
 	}
 
 	/*

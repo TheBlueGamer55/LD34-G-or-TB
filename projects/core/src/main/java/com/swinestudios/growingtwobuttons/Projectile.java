@@ -20,6 +20,8 @@ public class Projectile{
 	public Gameplay level;
 	public String type;
 	public Sprite projectileSprite;
+	
+	public Particles effect;
 
 	public Projectile(float x, float y, float velX, float velY, Gameplay level){
 		this.x = x;
@@ -31,6 +33,7 @@ public class Projectile{
 		isFalling = false;
 		this.level = level;
 		type = "Projectile";
+		effect = null;
 		//projectileSprite = new Sprite(new Texture(Gdx.files.internal("______.png")));
 		//adjustSprite(projectileSprite);
 		hitbox = new Rectangle(x, y, 16, 16); //Temporary
@@ -39,6 +42,9 @@ public class Projectile{
 	public void render(Graphics g){
 		if(isActive){
 			if(projectileSprite != null){
+				if(effect != null){
+					effect.render(g);
+				}
 				g.drawSprite(projectileSprite, x, y);
 			}
 			else{ //Temporary shape placeholder
@@ -59,6 +65,12 @@ public class Projectile{
 			hitbox.setX(x);
 			hitbox.setY(y);
 			
+			if(effect != null){
+				effect.x = this.hitbox.getCenterX();
+				effect.y = this.hitbox.getCenterY();
+				effect.update(delta);
+			}
+			
 			//Projectiles that have fallen off-screen are removed
 			if(y > Gdx.graphics.getHeight()){
 				level.projectiles.remove(this);
@@ -76,6 +88,10 @@ public class Projectile{
 			isFalling = true;
 			accelY = crashAccelY;
 		}
+	}
+	
+	public void setEffect(Color c, int amount, float radius, float maxSpeed){
+		effect = new Particles(hitbox.getCenterX(), hitbox.getCenterY(), amount, radius, maxSpeed, c, level);
 	}
 	
 	/*

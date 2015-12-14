@@ -7,6 +7,7 @@ import org.mini2Dx.core.graphics.Graphics;
 import org.mini2Dx.core.graphics.Sprite;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 
@@ -16,9 +17,12 @@ public class TreeProjectile{
 	public float x, y, velY, accelY;
 	public final float maxVelY = 8.5f; //Max dropping speed
 	public final float crashAccelY = 0.05f; //The falling acceleration
+	public final float knockedAwayAccelY = 0.5f;
+	public final float bounceVelY = -4.0f;
 	//public float fallingSpeed = 2.0f;
 	public final float maxGrowthWidth = 64;
 	public final float maxGrowthHeight = 64;
+	public float rotateSpeed = 20f;
 
 	public float growthTimer;
 	public final float growthBonus = 0.2f; //A selected acorn will grow faster
@@ -29,6 +33,7 @@ public class TreeProjectile{
 	public boolean canGrow;
 	public boolean isSelected;
 	public boolean onTree;
+	public boolean isKnockedAway;
 
 	public Rectangle hitbox;
 	public Gameplay level;
@@ -36,6 +41,9 @@ public class TreeProjectile{
 	public Sprite projectileSprite;
 	
 	public Random random = new Random();
+	
+	public static Sound rustle = Gdx.audio.newSound(Gdx.files.internal("leavesRustle2.wav"));
+	public Sound acornKnock = Gdx.audio.newSound(Gdx.files.internal("acornHit.wav"));
 
 	public TreeProjectile(float x, float y, Gameplay level){
 		this.x = x;
@@ -48,6 +56,7 @@ public class TreeProjectile{
 		canGrow = true;
 		isSelected = false;
 		onTree = true;
+		isKnockedAway = false;
 		this.level = level;
 		type = "TreeProjectile";
 		projectileSprite = new Sprite(new Texture(Gdx.files.internal("acorn.png")));
@@ -71,6 +80,9 @@ public class TreeProjectile{
 
 	public void update(float delta){
 		if(isActive){
+			if(isKnockedAway){
+				accelY = knockedAwayAccelY;
+			}
 			velY += accelY;
 			y += velY;
 			
@@ -82,6 +94,10 @@ public class TreeProjectile{
 			hitbox.setX(x);
 			hitbox.setY(y);
 			
+			if(isKnockedAway){
+				projectileSprite.rotate(rotateSpeed);
+			}
+			
 			//Projectiles that have fallen off-screen are reset
 			if(y > Gdx.graphics.getHeight()){
 				reset();
@@ -91,11 +107,12 @@ public class TreeProjectile{
 		}
 		else{ //Has fallen off screen
 			growthTimer += delta;
-			if(growthTimer > currentMaxGrowthTimer){ //Start the growth process
+			if(growthTimer > currentMaxGrowthTimer && !level.tree.isFalling){ //Start the growth process
 				growthTimer = 0;
 				isActive = true;
 				canGrow = true;
 				onTree = true;
+				rustle.play();
 				x = initialX;
 				y = initialY + level.tree.netOffset; //Keep the y position relative to the tree's hovering
 			}
@@ -112,6 +129,8 @@ public class TreeProjectile{
 		accelY = 0;
 		isActive = false;
 		canGrow = false;
+		isKnockedAway = false;
+		projectileSprite.setRotation(0);
 		projectileSprite.setSize(initialWidth, initialHeight);
 		hitbox.setWidth(initialWidth);
 		hitbox.setHeight(initialHeight);
@@ -169,10 +188,35 @@ public class TreeProjectile{
 		for(int i = 0; i < level.projectiles.size(); i++){
 			Projectile temp = level.projectiles.get(i);
 			if(temp != null && temp.isActive){
-				if(isColliding(temp.hitbox, this.x, this.y)){ //If there is a collision
-					temp.crash();
-					temp.velY = this.velY; //Momentum
-					//TODO maybe an explosion of particles for added effect?
+				if(isColliding(temp.hitbox, this.x, this.y) && !isKnockedAway){ //If there is a collision
+					//Size determines result
+					//For any projectile greater than this acorn in width or height
+					if(temp.hitbox.width > 64 || temp.hitbox.height > 64){
+						if(this.projectileSprite.getWidth() >= 60 && this.projectileSprite.getHeight() >= 60){
+							temp.crash();
+							temp.velY = this.velY; //Momentum
+						}
+						else{ //Too small, so acorn is knocked away
+							isKnockedAway = true;
+							acornKnock.play();
+							velY = bounceVelY; //Bounce
+							
+						}
+					}
+					//For any projectile smaller than acorn's max size
+					else{
+						float acornArea = this.hitbox.area();
+						float otherArea = temp.hitbox.area();
+						if(acornArea >= otherArea){
+							temp.crash();
+							temp.velY = this.velY;
+						}
+						else{
+							isKnockedAway = true;
+							acornKnock.play();
+							velY = bounceVelY;
+						}
+					}
 				}
 			}
 		}
