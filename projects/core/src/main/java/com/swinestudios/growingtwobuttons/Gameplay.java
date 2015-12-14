@@ -105,10 +105,6 @@ public class Gameplay implements GameScreen{
 		renderTreeProjectiles(g);
 		renderProjectiles(g);
 		tree.renderSelector(g);
-		//TODO Test drawing
-		g.setColor(Color.GREEN);
-		g.drawRect(0, 16, 640, 40);
-		g.drawRect(32, 0, 576, 80);
 		//System.out.println(Gdx.input.getX() + ", " + Gdx.input.getY()); //TODO remove later
 		
 		//TODO adjust UI for each menu

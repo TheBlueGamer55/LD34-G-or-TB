@@ -12,8 +12,11 @@ import com.badlogic.gdx.graphics.Texture;
 
 public class TreeTrunk implements InputProcessor{ 
 
-	public float x, y;
+	public float x, y, initialY;
 	public float velX, velY;
+	public float netOffset;
+	public final float hoverSpeed = 0.2f; //Speed of hovering effect
+	public final float hoverRange = 12; //Range of hovering effect
 
 	public boolean isActive;
 	
@@ -49,8 +52,10 @@ public class TreeTrunk implements InputProcessor{
 	public TreeTrunk(float x, float y, Gameplay level){
 		this.x = x;
 		this.y = y;
+		initialY = y;
 		velX = 0;
-		velY = 0;
+		velY = hoverSpeed;
+		netOffset = 0;
 		selection = 0;
 		health = maxHealth;
 		isActive = true;
@@ -73,7 +78,7 @@ public class TreeTrunk implements InputProcessor{
 
 	public void render(Graphics g){
 		g.drawSprite(treeTrunk, x, y); //300, 100
-		g.drawSprite(treeTop, 0, 0);
+		g.drawSprite(treeTop, 0, y - initialY);
 		
 		//Debug - remove later
 		g.drawString("" + (int)Math.floor(level.score), x, y);
@@ -83,6 +88,16 @@ public class TreeTrunk implements InputProcessor{
 	}
 
 	public void update(float delta){
+		netOffset += velY;
+		moveAcorns();
+		y += velY;
+		if(y > initialY + hoverRange){
+			velY *= -1;
+		}
+		if(y <= initialY){
+			velY *= -1;
+		}
+		
 		hitbox.setX(this.x);
 		hitbox.setY(this.y);
 
@@ -102,6 +117,17 @@ public class TreeTrunk implements InputProcessor{
 			level.gameOver = true;
 		}
 		dropAllAcorns();
+	}
+	
+	/*
+	 * Move acorns together with tree
+	 */
+	public void moveAcorns(){
+		for(int i = 0; i < acorns.length; i++){
+			if(acorns[i].onTree){
+				acorns[i].y = acorns[i].initialY + netOffset;
+			}
+		}
 	}
 	
 	/*

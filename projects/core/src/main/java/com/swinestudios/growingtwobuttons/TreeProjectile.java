@@ -96,6 +96,8 @@ public class TreeProjectile{
 				isActive = true;
 				canGrow = true;
 				onTree = true;
+				x = initialX;
+				y = initialY + level.tree.netOffset; //Keep the y position relative to the tree's hovering
 			}
 		}
 	}
