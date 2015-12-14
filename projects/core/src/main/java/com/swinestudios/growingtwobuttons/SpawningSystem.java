@@ -31,13 +31,17 @@ public class SpawningSystem{
 	 * Variety of projectile sprites
 	 * 0 = White dwarf
 	 * 1 = asteroid 1
+	 * 2 = asteroid 2
+	 * 3 = planet blue
 	 */
 	public Sprite whiteDwarf = new Sprite(new Texture(Gdx.files.internal("white_dwarf.png")));
 	public Sprite asteroid1 = new Sprite(new Texture(Gdx.files.internal("asteroid1.png")));
 	public Sprite asteroid2 = new Sprite(new Texture(Gdx.files.internal("asteroid2.png")));
+	public Sprite planet1 = new Sprite(new Texture(Gdx.files.internal("planet1.png")));
 	public Sprite[] projectileSprites = {whiteDwarf,
 										asteroid1,
-										asteroid2};
+										asteroid2,
+										planet1};
 
 	public SpawningSystem(Gameplay level){
 		isActive = true;
@@ -45,6 +49,8 @@ public class SpawningSystem{
 		spawnTimer = 0;
 		maxSpawnTimer = 2; //TODO adjust initial value later
 		type = "SpawningSystem";
+		//Unique scaling for planet1
+		planet1.setSize(planet1.getWidth() * 4, planet1.getHeight() * 4);
 	}
 
 	public void render(Graphics g){
@@ -66,6 +72,10 @@ public class SpawningSystem{
 	public void spawnProjectile(){
 		//Determines which sprite is chosen
 		int choice = random.nextInt(projectileSprites.length);
+		//Remove white dwarf - hardcoded "removal"
+		if(choice == 0){
+			choice = random.nextInt(projectileSprites.length - 1) + 1;
+		}
 		//Determines which side the projectile spawns on
 		boolean side = random.nextBoolean();
 		float spawnX;

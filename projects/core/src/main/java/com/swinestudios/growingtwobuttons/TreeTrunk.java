@@ -51,6 +51,7 @@ public class TreeTrunk implements InputProcessor{
 	public static Sound treeFall = Gdx.audio.newSound(Gdx.files.internal("treeDead.wav"));
 	public static Sound dropAcorn = Gdx.audio.newSound(Gdx.files.internal("dropSound.wav"));
 	public static Sound explosionHit = Gdx.audio.newSound(Gdx.files.internal("HighDamageHit.wav"));
+	public static Sound shatterHit = Gdx.audio.newSound(Gdx.files.internal("Smash.wav"));
 
 	//Controls/key bindings
 	public final int LEFT = Keys.LEFT;
@@ -175,8 +176,10 @@ public class TreeTrunk implements InputProcessor{
 				break;
 			case 1: //Hit by asteroid
 			case 2:
-				explosionHit.play();
+				shatterHit.play();
 				break;
+			case 3: //Hit by planet
+				explosionHit.play();
 			default:
 				break;
 		}

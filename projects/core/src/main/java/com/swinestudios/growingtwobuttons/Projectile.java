@@ -89,7 +89,7 @@ public class Projectile{
 	}
 	
 	/*
-	 * When a projectile gets hit by a tree's projectile, it crashes
+	 * When a projectile collides with an object, it crashes
 	 * downwards at an angle until it disappears at the bottom.
 	 */
 	public void crash(){
@@ -100,6 +100,10 @@ public class Projectile{
 			//TODO adjust debris constants later
 			if(ID == 1 || ID == 2){ //Debris only for asteroid projectiles
 				createDebris(Color.BROWN, 40, 600f, 4.0f, 3, 4);
+			}
+			if(ID == 3){ //Debris for planets (blue planet RGB = 103, 153, 202)
+				//Color temp = new Color(103, 153, 202, 1);
+				createDebris(Color.SLATE, 60, 600f, 4.0f, 3, 6);
 			}
 		}
 	}
