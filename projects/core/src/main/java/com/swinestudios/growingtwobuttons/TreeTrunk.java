@@ -1,5 +1,7 @@
 package com.swinestudios.growingtwobuttons;
 
+import java.util.Random;
+
 import org.mini2Dx.core.geom.Rectangle;
 import org.mini2Dx.core.graphics.Graphics;
 import org.mini2Dx.core.graphics.Sprite;
@@ -18,6 +20,8 @@ public class TreeTrunk implements InputProcessor{
 	public final float maxVelY = 8.5f; //Max falling speed
 	public final float fallingAccelY = 0.05f; //The falling acceleration
 	public float rotateSpeed = 20; //Rotating speed used with delta time
+	
+	public static final float scoreX = 244, scoreY = 6;
 
 	public float netOffset;
 	public final float hoverSpeed = 0.2f; //Speed of hovering effect
@@ -41,7 +45,7 @@ public class TreeTrunk implements InputProcessor{
 
 	public Sprite treeTrunk, treeTop;
 
-	public final int maxHealth = 3; //TODO adjust later
+	public final int maxHealth = 5; //TODO adjust later
 	public int health;
 
 	public Rectangle hitbox;
@@ -57,6 +61,8 @@ public class TreeTrunk implements InputProcessor{
 	public final int LEFT = Keys.LEFT;
 	public final int RIGHT = Keys.RIGHT;
 	public final int SPACE = Keys.SPACE;
+	
+	public Random random = new Random();
 
 	public TreeTrunk(float x, float y, Gameplay level){
 		this.x = x;
@@ -91,9 +97,11 @@ public class TreeTrunk implements InputProcessor{
 			g.drawSprite(treeTrunk, x, y); //300, 100
 			g.drawSprite(treeTop, 0, y - initialY);
 
-			//Debug - remove later
-			g.drawString("" + (int)Math.floor(level.score), x, y);
-			g.drawString("" + selection, x, y + 20);
+			//Score display
+			g.drawString("Height: " + (int)Math.floor(level.score) + " roots", scoreX + 40, scoreY);
+			g.drawString("Max height reached: " + (int)Gameplay.maxScore + " roots", scoreX, scoreY + 12);
+			//g.drawString("Height: " + (int)Math.floor(level.score) + " roots", Gdx.input.getX(), Gdx.input.getY());
+			//g.drawString("Max height reached: " + (int)Gameplay.maxScore + " roots", Gdx.input.getX(), Gdx.input.getY() + 12);
 		}
 	}
 
@@ -162,7 +170,7 @@ public class TreeTrunk implements InputProcessor{
 			}
 			treeTrunk.setOrigin(centerX, centerY);
 		}
-		dropAllAcorns();
+		dropRandomAcorns();
 	}
 	
 	/*
@@ -203,6 +211,19 @@ public class TreeTrunk implements InputProcessor{
 		for(int i = 0; i < level.treeProjectiles.size(); i++){
 			if(level.treeProjectiles.get(i).isActive && level.treeProjectiles.get(i).onTree){
 				level.treeProjectiles.get(i).drop();
+			}
+		}
+	}
+	
+	/*
+	 * Drops random acorns currently on the tree
+	 */
+	public void dropRandomAcorns(){
+		for(int i = 0; i < level.treeProjectiles.size(); i++){
+			if(level.treeProjectiles.get(i).isActive && level.treeProjectiles.get(i).onTree){
+				if(random.nextBoolean()){
+					level.treeProjectiles.get(i).drop();
+				}
 			}
 		}
 	}
@@ -309,7 +330,7 @@ public class TreeTrunk implements InputProcessor{
 			acorns[selection].isSelected = true;
 		}
 		if(keycode == SPACE){
-			if(acorns[selection].onTree){
+			if(!level.cloudsRushing && acorns[selection].onTree){
 				dropSelectedAcorn();
 			}
 		}

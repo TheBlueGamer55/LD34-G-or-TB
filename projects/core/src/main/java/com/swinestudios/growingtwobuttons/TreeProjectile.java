@@ -25,9 +25,9 @@ public class TreeProjectile{
 	public float rotateSpeed = 20f;
 
 	public float growthTimer;
-	public final float growthBonus = 0.2f; //A selected acorn will grow faster
-	public float currentMaxGrowthTimer = 2.0f; //How long before this projectile can start growing again
-	public final float maximumGrowthTime = 3.0f;
+	public final float growthBonus = 0.5f; //A selected acorn will grow faster
+	public float currentMaxGrowthTimer = 1.0f; //How long before this projectile can start growing again
+	public final float maximumGrowthTime = 1.0f; //The longest time it can take an acorn to start growing
 	
 	public boolean isActive;
 	public boolean canGrow;
@@ -192,7 +192,7 @@ public class TreeProjectile{
 					//Size determines result
 					//For any projectile greater than this acorn in width or height
 					if(temp.hitbox.width > 64 || temp.hitbox.height > 64){
-						if(this.projectileSprite.getWidth() >= 60 && this.projectileSprite.getHeight() >= 60){
+						if(this.projectileSprite.getWidth() >= 48 && this.projectileSprite.getHeight() >= 48){
 							temp.crash();
 							temp.velY = this.velY; //Momentum
 						}

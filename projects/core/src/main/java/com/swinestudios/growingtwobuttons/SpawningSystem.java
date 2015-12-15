@@ -15,12 +15,17 @@ public class SpawningSystem{
 	
 	//TODO adjust constants later
 	public final float spawnOffsetX = 128; //How far off screen horizontally a projectile spawns
-	//public final float spawnOffsetY = 32; //Y spawn coordinate from 0 to screen height - spawnOffsetY
+	public final float minSpawnY = 155f, maxSpawnY = 375f; //Y spawn coordinate from 155 to 375
 	public final float projectileVelY = 0.2f; //Due to relativity, projectiles move downward
-	public float projectileVelX = 0.5f;
+	public float projectileVelX = 0.8f;
 	
 	public float spawnTimer;
 	public float maxSpawnTimer;
+	public final float initialSpawnTimer = 5f; //Starting difficulty
+	
+	public float difficultyTimer;
+	public final float maxDifficultyTimer = 10f; //Duration of current difficulty TODO adjust later
+	public final float difficultyRate = 1f; //How much faster each difficulty gets
 
 	public Gameplay level;
 	public String type;
@@ -47,7 +52,8 @@ public class SpawningSystem{
 		isActive = true;
 		this.level = level;
 		spawnTimer = 0;
-		maxSpawnTimer = 2; //TODO adjust initial value later
+		difficultyTimer = 0;
+		maxSpawnTimer = initialSpawnTimer; 
 		type = "SpawningSystem";
 		//Unique scaling for planet1
 		planet1.setSize(planet1.getWidth() * 4, planet1.getHeight() * 4);
@@ -59,13 +65,23 @@ public class SpawningSystem{
 
 	public void update(float delta){
 		if(isActive){
-			if(spawnTimer < maxSpawnTimer){
+			if(spawnTimer <= maxSpawnTimer){
 				spawnTimer += delta;
 				if(spawnTimer > maxSpawnTimer){
 					spawnTimer = 0;
 					spawnProjectile();
 				}
 			}
+			if(difficultyTimer < maxDifficultyTimer){
+				difficultyTimer += delta;
+				if(difficultyTimer > maxDifficultyTimer){
+					difficultyTimer = 0;
+					if(maxSpawnTimer - difficultyRate > spawnTimer){
+						maxSpawnTimer -= difficultyRate;
+					}
+				}
+			}
+			System.out.println(spawnTimer + "\t" + difficultyTimer);
 		}
 	}
 	
@@ -92,6 +108,7 @@ public class SpawningSystem{
 			velX = -projectileVelX;
 		}
 		spawnY = 90 + random.nextInt((int) level.tree.hitbox.height); //TODO adjust later
+		spawnY = random.nextInt((int) ((maxSpawnY - minSpawnY) + 1)) + minSpawnY;
 		
 		Projectile p = new Projectile(spawnX, spawnY, velX, velY, level);
 		p.setSprite(projectileSprites[choice]);

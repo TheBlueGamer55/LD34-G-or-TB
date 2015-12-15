@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.mini2Dx.core.game.GameContainer;
 import org.mini2Dx.core.graphics.Graphics;
+import org.mini2Dx.core.graphics.Sprite;
 import org.mini2Dx.core.screen.GameScreen;
 import org.mini2Dx.core.screen.ScreenManager;
 import org.mini2Dx.core.screen.Transition;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 
 public class Gameplay implements GameScreen{
 
@@ -29,6 +31,10 @@ public class Gameplay implements GameScreen{
 	public float cloudsTimer;
 	public final float maxCloudsTimer = 2f; //How long the intro cloud scene lasts
 	public final int cloudAmount = 100; //Total number of clouds
+	
+	public boolean showingIntro;
+	public float introTimer;
+	public float maxIntroTimer = 2f;
 
 	public boolean isShaking;
 	public final int shakeMagnitude = 12; //Screen shake
@@ -47,6 +53,10 @@ public class Gameplay implements GameScreen{
 	public ArrayList<Projectile> projectiles;
 	public ArrayList<TreeProjectile> treeProjectiles;
 	public ArrayList<Particles> debris;
+	
+	public Sprite introMessage, pauseMessage, gameOverMessage;
+	
+	//public static Sound theme; //TODO need music
 
 	public Random random;
 
@@ -57,6 +67,11 @@ public class Gameplay implements GameScreen{
 
 	@Override
 	public void initialise(GameContainer gc){
+		//theme = Gdx.audio.newSound(Gdx.files.internal(""));
+		introMessage = new Sprite(new Texture(Gdx.files.internal("intro_text.png")));
+		introMessage.scale(1);
+		pauseMessage = new Sprite(new Texture(Gdx.files.internal("pause_quit_text.png")));
+		gameOverMessage = new Sprite(new Texture(Gdx.files.internal("dead_text.png")));
 		random = new Random();
 		stars = new Star[starAmount];
 		for(int i = 0; i < stars.length; i++){
@@ -66,7 +81,7 @@ public class Gameplay implements GameScreen{
 
 	@Override
 	public void postTransitionIn(Transition t){
-		
+		//theme.loop();
 	}
 
 	@Override
@@ -74,6 +89,7 @@ public class Gameplay implements GameScreen{
 		gameOver = false;
 		paused = false;
 		score = 0;
+		//theme.stop();
 	}
 
 	@Override
@@ -83,12 +99,15 @@ public class Gameplay implements GameScreen{
 		gameOver = false;
 		paused = false;
 		cloudsRushing = true;
+		showingIntro = true;
 		score = 0;
+		introTimer = 0;
+		cloudsTimer = 0;
 
 		treeProjectiles = new ArrayList<TreeProjectile>();
 		projectiles = new ArrayList<Projectile>();
 		debris = new ArrayList<Particles>();
-		tree = new TreeTrunk(300, 100, this); //TODO adjust position later
+		tree = new TreeTrunk(300, 100, this); 
 		spawner = new SpawningSystem(this);
 		cloudSystem = new CloudSystem(0, 0, cloudAmount, this);
 		cloudSystem.isTimed = true;
@@ -132,23 +151,34 @@ public class Gameplay implements GameScreen{
 		renderDebris(g);
 		renderProjectiles(g);
 		tree.renderSelector(g);
-		//System.out.println(Gdx.input.getX() + ", " + Gdx.input.getY()); //TODO remove later
+		//System.out.println(Gdx.input.getX() + ", " + Gdx.input.getY()); //TODO placement debug
 
-		//TODO adjust UI for each menu
+		if(showingIntro){
+			g.drawSprite(introMessage, 255, 216);
+		}
 		if(gameOver){
 			isShaking = false;
-			g.setColor(Color.RED);
-			g.drawString("You died! Press Escape to go back to the main menu", 160, 240);
+			g.drawSprite(gameOverMessage, 200, 214);
+			//g.setColor(Color.RED);
+			//g.drawString("You died! Press Escape to go back to the main menu", 160, 240);
 		}
 		if(paused){
-			g.setColor(Color.RED);
-			g.drawString("Are you sure you want to quit? Y or N", 220, 240);
+			g.drawSprite(pauseMessage, 213, 200);
+			//g.setColor(Color.RED);
+			//g.drawString("Are you sure you want to quit? Y or N", 220, 240);
 		}
 	}
 
 	@Override
 	public void update(GameContainer gc, ScreenManager<? extends GameScreen> sm, float delta) {
 		if(!paused && !gameOver){
+			if(showingIntro){
+				introTimer += delta;
+				if(introTimer > maxIntroTimer){
+					introTimer = 0;
+					showingIntro = false;
+				}
+			}
 			if(cloudsRushing){ //Intro scene
 				tree.update(delta);
 				tree.updateSelector(delta);

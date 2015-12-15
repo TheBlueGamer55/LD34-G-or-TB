@@ -76,6 +76,7 @@ public class CloudSystem{
 						clouds[i].isActive = false;
 					}
 					level.cloudsRushing = false;
+					level.cloudsTimer = 0;
 				}
 			}
 		}
