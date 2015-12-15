@@ -25,21 +25,29 @@ public class Gameplay implements GameScreen{
 	public boolean gameOver = false;
 	public boolean paused = false;
 	
+	public boolean cloudsRushing;
+	public float cloudsTimer;
+	public final float maxCloudsTimer = 2f; //How long the intro cloud scene lasts
+	public final int cloudAmount = 100; //Total number of clouds
+
 	public boolean isShaking;
 	public final int shakeMagnitude = 12; //Screen shake
 	public float screenShakeTimer;
 	public float maxScreenShakeTimer = 0.5f;
-	
+
 	public final int starAmount = 80; //For the moving stars in the background
 	public Star[] stars;
 
 	public TreeTrunk tree;
 	public SpawningSystem spawner;
+	public CloudSystem cloudSystem;
+	public Color backgroundColor;
+	public final float bgRed = 0, bgGreen = 145, bgBlue = 255;
 
 	public ArrayList<Projectile> projectiles;
 	public ArrayList<TreeProjectile> treeProjectiles;
 	public ArrayList<Particles> debris;
-	
+
 	public Random random;
 
 	@Override
@@ -58,7 +66,7 @@ public class Gameplay implements GameScreen{
 
 	@Override
 	public void postTransitionIn(Transition t){
-
+		
 	}
 
 	@Override
@@ -70,9 +78,11 @@ public class Gameplay implements GameScreen{
 
 	@Override
 	public void preTransitionIn(Transition t){
+		backgroundColor = new Color(bgRed / 255f, bgGreen / 255f, bgBlue / 255f, 1);
 		isShaking = false;
 		gameOver = false;
 		paused = false;
+		cloudsRushing = true;
 		score = 0;
 
 		treeProjectiles = new ArrayList<TreeProjectile>();
@@ -80,6 +90,8 @@ public class Gameplay implements GameScreen{
 		debris = new ArrayList<Particles>();
 		tree = new TreeTrunk(300, 100, this); //TODO adjust position later
 		spawner = new SpawningSystem(this);
+		cloudSystem = new CloudSystem(0, 0, cloudAmount, this);
+		cloudSystem.isTimed = true;
 
 		//Input handling
 		InputMultiplexer multiplexer = new InputMultiplexer();
@@ -94,6 +106,13 @@ public class Gameplay implements GameScreen{
 
 	@Override
 	public void render(GameContainer gc, Graphics g){
+		//Blue sky transition
+		if(cloudSystem.isTransition){
+			float ratio = 1 - (cloudSystem.y / Gdx.graphics.getHeight());
+			backgroundColor.set(0, bgGreen * ratio / 255f, bgBlue * ratio / 255f, 1);
+		}
+		g.setBackgroundColor(backgroundColor);
+		
 		//Screen shake effect
 		if(isShaking){
 			g.translate(random.nextInt(shakeMagnitude * 2) - shakeMagnitude, random.nextInt(shakeMagnitude * 2) - shakeMagnitude);
@@ -101,15 +120,20 @@ public class Gameplay implements GameScreen{
 		else{
 			g.translate(0, 0);
 		}
-		
-		renderStars(g);
+
+		if(cloudSystem.isTransition || !cloudsRushing){
+			renderStars(g); //Don't draw stars if still on blue sky with clouds
+		}
 		tree.render(g);
+		if(cloudsRushing){
+			cloudSystem.render(g);
+		}
 		renderTreeProjectiles(g);
 		renderDebris(g);
 		renderProjectiles(g);
 		tree.renderSelector(g);
 		//System.out.println(Gdx.input.getX() + ", " + Gdx.input.getY()); //TODO remove later
-		
+
 		//TODO adjust UI for each menu
 		if(gameOver){
 			isShaking = false;
@@ -125,30 +149,44 @@ public class Gameplay implements GameScreen{
 	@Override
 	public void update(GameContainer gc, ScreenManager<? extends GameScreen> sm, float delta) {
 		if(!paused && !gameOver){
-			if(isShaking){
-				screenShakeTimer += delta;
-				if(screenShakeTimer >= maxScreenShakeTimer){
-					screenShakeTimer = 0;
-					isShaking = false;
+			if(cloudsRushing){ //Intro scene
+				tree.update(delta);
+				tree.updateSelector(delta);
+				cloudSystem.update(delta);
+				if(cloudSystem.isTransition){
+					updateStars(delta);
+				}
+				cloudsTimer += delta;
+				if(cloudsTimer > maxCloudsTimer){
+					cloudSystem.isTransition = true;
 				}
 			}
-			
-			updateStars(delta);
-			updateDebris(delta);
-			updateProjectiles(delta);
-			updateTreeProjectiles(delta);
-			tree.update(delta);
-			tree.updateSelector(delta);
-			spawner.update(delta);
-			
-			//Update score
-			score += delta*100;
-			if(score > maxScore){
-				maxScore = score;
-			}
-			
-			if(Gdx.input.isKeyJustPressed(Keys.ESCAPE)){
-				paused = true;
+			else{ //Main gameplay
+				if(isShaking){
+					screenShakeTimer += delta;
+					if(screenShakeTimer >= maxScreenShakeTimer){
+						screenShakeTimer = 0;
+						isShaking = false;
+					}
+				}
+
+				updateStars(delta);
+				updateDebris(delta);
+				updateProjectiles(delta);
+				updateTreeProjectiles(delta);
+				tree.update(delta);
+				tree.updateSelector(delta);
+				spawner.update(delta);
+
+				//Update score
+				score += delta*100;
+				if(score > maxScore){
+					maxScore = score;
+				}
+
+				if(Gdx.input.isKeyJustPressed(Keys.ESCAPE)){
+					paused = true;
+				}
 			}
 		}
 		else{
@@ -179,7 +217,7 @@ public class Gameplay implements GameScreen{
 			projectiles.get(i).update(delta);
 		}
 	}
-	
+
 	public void renderTreeProjectiles(Graphics g){
 		for(int i = 0; i < treeProjectiles.size(); i++){
 			treeProjectiles.get(i).render(g);
@@ -191,25 +229,25 @@ public class Gameplay implements GameScreen{
 			treeProjectiles.get(i).update(delta);
 		}
 	}
-	
+
 	public void renderDebris(Graphics g){
 		for(int i = 0; i < debris.size(); i++){
 			debris.get(i).render(g);
 		}
 	}
-	
+
 	public void updateDebris(float delta){
 		for(int i = 0; i < debris.size(); i++){
 			debris.get(i).update(delta);
 		}
 	}
-	
+
 	public void renderStars(Graphics g){
 		for(int i = 0; i < stars.length; i++){ 
 			stars[i].render(g);
 		}
 	}
-	
+
 	public void updateStars(float delta){
 		for(int i = 0; i < stars.length; i++){
 			stars[i].update(delta);
