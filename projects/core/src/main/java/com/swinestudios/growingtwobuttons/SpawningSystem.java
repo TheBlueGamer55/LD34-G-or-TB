@@ -81,7 +81,7 @@ public class SpawningSystem{
 					}
 				}
 			}
-			System.out.println(spawnTimer + "\t" + difficultyTimer);
+			//System.out.println(spawnTimer + "\t" + difficultyTimer);
 		}
 	}
 	
