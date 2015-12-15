@@ -15,6 +15,7 @@ import org.mini2Dx.core.screen.transition.FadeOutTransition;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 
@@ -56,7 +57,7 @@ public class Gameplay implements GameScreen{
 	
 	public Sprite introMessage, pauseMessage, gameOverMessage;
 	
-	//public static Sound theme; //TODO need music
+	public static Sound theme; 
 
 	public Random random;
 
@@ -67,7 +68,7 @@ public class Gameplay implements GameScreen{
 
 	@Override
 	public void initialise(GameContainer gc){
-		//theme = Gdx.audio.newSound(Gdx.files.internal(""));
+		theme = Gdx.audio.newSound(Gdx.files.internal("spucey.ogg"));
 		introMessage = new Sprite(new Texture(Gdx.files.internal("intro_text.png")));
 		introMessage.scale(1);
 		pauseMessage = new Sprite(new Texture(Gdx.files.internal("pause_quit_text.png")));
@@ -81,7 +82,7 @@ public class Gameplay implements GameScreen{
 
 	@Override
 	public void postTransitionIn(Transition t){
-		//theme.loop();
+		theme.loop(0.6f);
 	}
 
 	@Override
@@ -89,7 +90,7 @@ public class Gameplay implements GameScreen{
 		gameOver = false;
 		paused = false;
 		score = 0;
-		//theme.stop();
+		theme.stop();
 	}
 
 	@Override
