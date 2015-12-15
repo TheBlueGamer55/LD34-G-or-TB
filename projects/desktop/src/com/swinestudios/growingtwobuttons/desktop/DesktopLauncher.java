@@ -16,7 +16,7 @@ public class DesktopLauncher {
 		config.resizable = false;
         config.foregroundFPS = 30;
         config.backgroundFPS = 30;
-        config.title = "TO BE NAMED LATER";
+        config.title = "Deblight";
 		new DesktopMini2DxGame(new GrowingTwoButtons(), config);
 	}
 }
